@@ -8,6 +8,7 @@ print("started plotting")
 
 file = open("experiments/uniformdistr.txt")
 file1 = open("experiments/ConstN.txt")
+file2 = open("experiments/small1.txt")
 #fileskip = open("outskips.txt")
 
 X, Y, Z = [],[],[]
@@ -58,17 +59,46 @@ for i in range(64):
 fig.suptitle('number of binary digits I = 1:64, array length N = 10^4:16*10^4, number of repeated tests with same array length and digits = 50', fontsize=16)
 plt.show()
 
-
-pmf = scipy.stats.binom.pmf(X1[0],1000000,0.5)
-ax.plot(X1[0],pmf)
 fig,ax = plt.subplots()
-ax.hist(X1[0],100)
+A = np.sort(X1[0])
+pmf = scipy.stats.binom.pmf(A-64*(6*10**6+4),64000000,0.5)
+ax.plot(A,pmf)
+ax.hist(A,100,normed=True)
 ax.set(xlabel='x: number of operations N', ylabel='distribution',
     title='distribution of number of operations. number of digits I = 64, array length N = 10^6, number of tests M = 10^4')
 plt.show()
 
 
+
 fig,ax = plt.subplots()
 
+X, Y, Z = [],[],[]
+for line in file2:
+  l = [int(s) for s in line.split()]
+  Y.append(l[0])
+  Z.append(l[1])
+  X.append(l[2:])
+
+for i in range(len(X)):
+    ax.plot(Y[i]*np.ones(len(X[i])),X[i],marker = '.')
+
+ax.grid()
+ax.set(xlabel='x: number of elements n', ylabel='y: number of operations')
+fig.suptitle('number of operations on small sets. n = 10 to 1000, m = 64, 10000 repeats')
+X = np.array(X)
+line = np.polyfit(np.repeat(Y[:],10000),np.ndarray.flatten(X[:][:]),1)
+ax.plot([0,1000],[line[1],line[0]*1000+line[1]],color = 'black', alpha = 0.5, linestyle = '--')
+
+plt.show()
+
+fig,ax = plt.subplots()
+A = np.sort(X[-1])
+pmf = scipy.stats.binom.pmf(A-64*(6*1000+4),64000,0.5)
+ax.plot(A,pmf)
+ax.hist(A,100,normed=True)
+ax.set(xlabel='x: number of operations N', ylabel='y: distribution')
+fig.suptitle('distribution n = 1000, m = 64, 10000 repeats')
+
+plt.show()
 
 file.close()
